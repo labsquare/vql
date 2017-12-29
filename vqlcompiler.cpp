@@ -12,16 +12,26 @@ void VqlCompiler::setSource(const string &source)
 
 void VqlCompiler::compile()
 {
-    mSource="SELECT chr,pos FROM table";
+    mSource="SELECT chr,pos FROM table WHERE a=5 AND b=6 INSIDE region";
 
     auto varname =  x3::rule<class varname, string>()
-                 =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.')) - "SELECT" - "FROM"];
+                 =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))
+                    - "SELECT" - "FROM" - "INSIDE"];
 
-    auto fieldsRule = x3::rule<class fields, vector<string>> ()
+    auto condition =  x3::rule<class condition, string>()
+                   =  x3::lexeme[+x3::char_];
+
+    auto selectRule = x3::rule<class fields, vector<string>> ()
                     = "SELECT" >> varname % ",";
 
     auto fromRule   = x3::rule<class fromRule, string>()
                     = "FROM" >> varname;
+
+    auto whereRule  = x3::rule<class whereRule, vector<string>>()
+                    = "WHERE" >> condition % " AND ";
+
+    auto insideRule = x3::rule<class insideRule, string>()
+                    = "INSIDE" >> varname;
 
     auto begin = mSource.begin();
     auto end   = mSource.end();
@@ -29,7 +39,7 @@ void VqlCompiler::compile()
    vector<string> results;
 
     x3::phrase_parse(begin,end,
-                     fieldsRule >> -fromRule,
+                     selectRule >> fromRule >> -whereRule >> -insideRule,
                      x3::space, results);
 
     if (begin != end)
