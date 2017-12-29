@@ -15,8 +15,8 @@ void VqlCompiler::compile()
     mSource="SELECT chr,pos FROM table WHERE a=5 AND b=6 INSIDE region";
 
     auto varname =  x3::rule<class varname, string>()
-                 =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))
-                    - "SELECT" - "FROM" - "INSIDE"];
+                 =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))];
+
 
     auto condition =  x3::rule<class condition, string>()
                    =  x3::lexeme[+x3::char_];
