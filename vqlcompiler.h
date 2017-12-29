@@ -4,6 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <map>
+#include <boost/spirit/home/x3.hpp>
+#include <boost/fusion/include/adapt_struct.hpp>
+#include <boost/fusion/adapted/std_pair.hpp>
+
+using namespace boost::spirit;
 
 /*
 Exemple of query :
