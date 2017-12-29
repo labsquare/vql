@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 project(vql)
 
-find_package(Boost 1.58 REQUIRED)
+#find_package(Boost 1.58 REQUIRED)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)

@@ -4,10 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <map>
-#include <boost/spirit/home/x3.hpp>
-#include <boost/fusion/include/adapt_struct.hpp>
-#include <boost/fusion/adapted/std_pair.hpp>
-
+#include "boost/spirit/home/x3.hpp"
+#include "boost/fusion/include/adapt_struct.hpp"
+#include "boost/fusion/adapted/std_pair.hpp"
+#include <boost/fusion/sequence.hpp>
+#include <boost/fusion/include/sequence.hpp>
 using namespace boost::spirit;
 
 /*
@@ -20,6 +21,7 @@ SELECT chr, pos, ref, sample["boby"].gt FROM variant INSIDE bed
 */
 
 using namespace std;
+
 class VqlCompiler
 {
 public:
@@ -36,6 +38,7 @@ private:
     string mSource;
     vector<string> mSelectFields;
     map<string, vector<string>> mSampleFields;
+    string mTableName;
     string mWhereClause;
     string mInsideClause;
 
