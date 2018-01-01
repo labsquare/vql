@@ -19,7 +19,7 @@ void VqlCompiler::compile()
 
 
     auto condition =  x3::rule<class condition, string>()
-                   =  x3::lexeme[+x3::char_];
+                   =  x3::lexeme[*(x3::char_ - "INSIDE")];
 
     auto selectRule = x3::rule<class fields, vector<string>> ()
                     = "SELECT" >> varname % ",";
