@@ -38,6 +38,13 @@ void VqlCompiler::compile()
 
    vector<string> results;
 
+   // How to fill
+   vector<string> selectData;
+   string fromData;
+   string whereData;
+   string insideData;
+
+
     x3::phrase_parse(begin,end,
                      selectRule >> fromRule >> -whereRule >> -insideRule,
                      x3::space, results);
