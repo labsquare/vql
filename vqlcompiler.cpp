@@ -18,52 +18,42 @@ void VqlCompiler::compile()
                  =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))];
 
 
-    auto condition =  x3::rule<class condition, string>()
-                   =  x3::lexeme[*(x3::char_ - "INSIDE")];
+    auto condition =  x3::lexeme[*(x3::char_ - "INSIDE")];
 
     auto selectRule = x3::rule<class fields, vector<string>> ()
                     = "SELECT" >> varname % ",";
 
-    auto fromRule   = x3::rule<class fromRule, string>()
-                    = "FROM" >> varname;
+    auto fromRule   = "FROM" >> varname;
 
-    auto whereRule  = x3::rule<class whereRule, vector<string>>()
-                    = "WHERE" >> condition % " AND ";
+    auto whereRule  = "WHERE" >> condition;
 
-    auto insideRule = x3::rule<class insideRule, string>()
-                    = "INSIDE" >> varname;
+    auto insideRule = "INSIDE" >> varname;
 
     auto begin = mSource.begin();
     auto end   = mSource.end();
 
-   vector<string> results;
 
-   // How to fill
-   vector<string> selectData;
-   string fromData;
-   string whereData;
-   string insideData;
-
-
+    result out;
     x3::phrase_parse(begin,end,
                      selectRule >> fromRule >> -whereRule >> -insideRule,
-                     x3::space, results);
+                     x3::space, out);
+
+
 
     if (begin != end)
         cout<<"could not parse "<<endl;
     else
         cout<<"parse succes"<<endl;
 
-    for (auto i : results)
-        cout<<i<<endl;
-
-
 
 //    cout<<"selected fields: "<<endl;
-//    for (string i : mSelectFields)
-//        cout<<i<<endl;
+    for (string i : out.selectData)
+        cout<<i<<endl;
 
-//    cout<<"table name: "<<mTableName;
+    cout<<"table name: "<<out.fromData<<endl;
+    cout<<"where"<<out.whereData<<endl;
+
+    cout<<"inside:"<<out.insideData<<endl;
 
 
 }
