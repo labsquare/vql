@@ -1,65 +1,86 @@
 #include "vqlcompiler.h"
 
-VqlCompiler::VqlCompiler(const string &source)
-    :mSource(source)
+VqlParser::VqlParser()
 {
 
 }
-void VqlCompiler::setSource(const string &source)
+
+bool VqlParser::parse(const string &source)
 {
     mSource = source;
-}
 
-void VqlCompiler::compile()
-{
-    mSource="SELECT chr,pos FROM table WHERE a=5 AND b=6 INSIDE region";
-
-    auto varname =  x3::rule<class varname, string>()
-                 =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))];
+    auto varnameRule =  x3::rule<class varname, string>()
+            =  x3::lexeme[(x3::alpha >> *(x3::alnum|'_'|'.'))];
 
 
-    auto condition =  x3::lexeme[*(x3::char_ - "INSIDE")];
+    auto columnsRule =  x3::rule<class varname, string>()
+            =  x3::lexeme[*(x3::char_ - '"' - "FROM")];
+
+    auto conditionRule =  x3::lexeme[*(x3::char_ - "INSIDE")];
 
     auto selectRule = x3::rule<class fields, vector<string>> ()
-                    = "SELECT" >> varname % ",";
+            = "SELECT" >> columnsRule % ",";
 
-    auto fromRule   = "FROM" >> varname;
+    auto fromRule   = "FROM" >> varnameRule;
 
-    auto whereRule  = "WHERE" >> condition;
+    auto whereRule  = "WHERE" >> conditionRule;
 
-    auto insideRule = "INSIDE" >> varname;
+    auto insideRule = "INSIDE" >> varnameRule;
 
     auto begin = mSource.begin();
     auto end   = mSource.end();
 
 
-    result out;
     x3::phrase_parse(begin,end,
                      selectRule >> fromRule >> -whereRule >> -insideRule,
-                     x3::space, out);
+                     x3::space, mResult);
 
+    // parse all
+    if (begin != end){
+        cout<<"cannot parse "<<endl;
+        return false;
+    }
 
-
-    if (begin != end)
-        cout<<"could not parse "<<endl;
-    else
-        cout<<"parse succes"<<endl;
-
-
-//    cout<<"selected fields: "<<endl;
-    for (string i : out.selectData)
-        cout<<i<<endl;
-
-    cout<<"table name: "<<out.fromData<<endl;
-    cout<<"where"<<out.whereData<<endl;
-
-    cout<<"inside:"<<out.insideData<<endl;
+    return true;
 
 
 }
 
-const string &VqlCompiler::source() const
+const string &VqlParser::source() const
 {
 
 }
 
+const string &VqlParser::tableName() const
+{
+    return mResult.fromData;
+}
+
+const vector<string> &VqlParser::columns() const
+{
+    return mResult.selectData;
+}
+
+const string &VqlParser::conditions() const
+{
+    return mResult.whereData;
+}
+
+const string &VqlParser::inside() const
+{
+    return mResult.insideData;
+}
+
+
+std::ostream &operator<<(std::ostream& os, VqlParser& c)
+{
+
+    os<<"table name: "<<c.tableName()<<"\n";
+    os<<"columns: ";
+    std::copy(c.columns().begin(), c.columns().end(), std::ostream_iterator<string>(os," "));
+    os<<"\n";
+    os<<"conditions: "<<c.conditions()<<"\n";
+    os<<"inside: "<<c.inside()<<"\n";
+
+    return os;
+}

@@ -3,8 +3,11 @@
 int main(int argc, char *argv[])
 {
 
-    VqlCompiler compiler("SELECT chr,pos FROM variants");
-    compiler.compile();
+    VqlParser compiler;
+    compiler.parse("SELECT chr,sample['boby ad'].gt FROM variants WHERE chr=3 INSIDE boby");
+
+    std::cout<<compiler;
+
 
     return 0;
 }

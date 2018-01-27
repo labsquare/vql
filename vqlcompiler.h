@@ -4,14 +4,11 @@
 #include <vector>
 #include <iostream>
 #include <map>
-#include "boost/spirit/home/x3.hpp"
-#include "boost/fusion/include/adapt_struct.hpp"
-#include "boost/fusion/adapted/std_pair.hpp"
-#include <boost/fusion/sequence.hpp>
-#include <boost/fusion/include/sequence.hpp>
-
+#include <boost/spirit/home/x3.hpp>
 #include <boost/fusion/adapted/struct/adapt_struct.hpp>
 #include <boost/fusion/include/adapt_struct.hpp>
+
+
 
 using namespace boost::spirit;
 
@@ -27,7 +24,7 @@ SELECT chr, pos, ref, sample["boby"].gt FROM variant INSIDE bed
 using namespace std;
 
 
-struct result {
+struct VqlResult {
    std::vector<std::string> selectData;
    std::string fromData;
    std::string whereData;
@@ -37,35 +34,33 @@ struct result {
 
 BOOST_FUSION_ADAPT_STRUCT
 (
-    result,
+    VqlResult,
     selectData,
     fromData,
     whereData,
     insideData
 );
 
-
-
-class VqlCompiler
+class VqlParser
 {
 public:
-    VqlCompiler(const string& source);
-    void setSource(const string& source);
-    void compile();
-
+    VqlParser();
+    bool parse(const string& source);
 
     const string& source() const;
-
+    const string& tableName() const;
+    const vector<string>& columns() const;
+    const string& conditions() const;
+    const string& inside() const;
 
 
 private:
     string mSource;
-    vector<string> mSelectFields;
-    map<string, vector<string>> mSampleFields;
-    string mTableName;
-    string mWhereClause;
-    string mInsideClause;
+    VqlResult mResult;
 
 };
+
+
+std::ostream &operator<<(std::ostream& os, VqlParser& c);
 
 #endif // VQLCOMPILER_H
